@@ -106,13 +106,13 @@ export const reloadRoutePage = () => {
  */
 export const logout = async () => {
   try {
-    // const res = await logoutApi() as unknown as MyResponseType
-    // if(res.code === ResultEnum.SUCCESS) {
-    window['$message'].success(window['$t']('global.logout_success'))
-    clearCookie(RequestHttpHeaderEnum.COOKIE)
-    clearLocalStorage(StorageEnum.GO_SYSTEM_STORE)
-    routerTurnByName(PageEnum.BASE_LOGIN_NAME)
-    // }
+    const res = await logoutApi() as unknown as MyResponseType
+    if(res.code === ResultEnum.SUCCESS) {
+      window['$message'].success(window['$t']('global.logout_success'))
+      clearCookie(RequestHttpHeaderEnum.COOKIE)
+      clearLocalStorage(StorageEnum.GO_SYSTEM_STORE)
+      routerTurnByName(PageEnum.BASE_LOGIN_NAME)
+    }
   } catch (error) {
     window['$message'].success(window['$t']('global.logout_failure'))
   }
@@ -205,7 +205,7 @@ export const loginCheck = () => {
  * * 预览地址
  * @returns 
  */
-export const previewPath = (id?: string | number) => {
+ export const previewPath = (id?: string | number) => {
   const { origin, pathname } = document.location
   const path = fetchPathByName(PreviewEnum.CHART_PREVIEW_NAME, 'href')
   const previewPath = `${origin}${pathname}${path}/${id || fetchRouteParamsLocation()}`

@@ -11,7 +11,7 @@ import throttle from 'lodash/throttle'
 // 接口状态
 import { ResultEnum } from '@/enums/httpEnum'
 // 接口
-import { saveOneProjectLargeScreenApi, fetchOneProjectLargeScreenApi, uploadFile, updateProjectApi } from '@/api/path'
+import { saveProjectApi, fetchProjectApi, uploadFile, updateProjectApi } from '@/api/path'
 // 画布枚举
 import { SyncEnum } from '@/enums/editPageEnum'
 import { CreateComponentType, CreateComponentGroupType, ConfigType } from '@/packages/index.d'
@@ -43,7 +43,6 @@ const componentMerge = (object: any, sources: any, notComponent = false) => {
 
 // 请求处理
 export const useSync = () => {
-  console.log('保存')
   const chartEditStore = useChartEditStore()
   const chartHistoryStore = useChartHistoryStore()
   const systemStore = useSystemStore()
@@ -132,7 +131,7 @@ export const useSync = () => {
             // 分组插入到列表
             chartEditStore.addComponentList(groupClass, false, true)
           } else {
-            await create(comItem as CreateComponentType)
+            await  create(comItem as CreateComponentType)
           }
         }
       } else {
@@ -172,17 +171,14 @@ export const useSync = () => {
   const dataSyncFetch = async () => {
     chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.START)
     try {
-      const res = await fetchOneProjectLargeScreenApi(fetchRouteParamsLocation()) as unknown as ApiResponseType
-      if (res && res.IsOk) {
-        const { Response } = res
-        if (Response) {
-          const result = JSON.parse(Response)
-          updateStoreInfo(result)
+      const res = await fetchProjectApi({ projectId: fetchRouteParamsLocation() }) as unknown as MyResponseType
+      if (res.code === ResultEnum.SUCCESS) {
+        if (res.data) {
+          updateStoreInfo(res.data)
           // 更新全局数据
-          if (result && result.content)
-            await updateComponent(JSON.parse(result.content))
+          await updateComponent(JSON.parse(res.data.content))
           return
-        } else {
+        }else {
           chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, fetchRouteParamsLocation())
         }
         setTimeout(() => {
@@ -199,15 +195,15 @@ export const useSync = () => {
 
   // * 数据保存
   const dataSyncUpdate = throttle(async () => {
-    if (!fetchRouteParamsLocation()) return
+    if(!fetchRouteParamsLocation()) return
 
-    // if (!systemStore.getFetchInfo.OSSUrl) {
-    //   window['$message'].error('数据保存失败，请刷新页面重试！')
-    //   return
-    // }
+    if(!systemStore.getFetchInfo.OSSUrl) {
+      window['$message'].error('数据保存失败，请刷新页面重试！')
+      return
+    }
 
     let projectId = chartEditStore.getProjectInfo[ProjectInfoEnum.PROJECT_ID];
-    if (projectId === null || projectId === '') {
+    if(projectId === null || projectId === ''){
       window['$message'].error('数据初未始化成功,请刷新页面！')
       return
     }
@@ -224,27 +220,24 @@ export const useSync = () => {
     })
 
     // 上传预览图
-    // let uploadParams = new FormData()
-    // uploadParams.append('object', base64toFile(canvasImage.toDataURL(), `${fetchRouteParamsLocation()}_index_preview.png`))
-    // const uploadRes = await uploadFile(systemStore.getFetchInfo.OSSUrl, uploadParams) as unknown as MyResponseType
+    let uploadParams = new FormData()
+    uploadParams.append('object', base64toFile(canvasImage.toDataURL(), `${fetchRouteParamsLocation()}_index_preview.png`))
+    const uploadRes = await uploadFile(systemStore.getFetchInfo.OSSUrl, uploadParams) as unknown as MyResponseType
     // 保存预览图
-    // if (uploadRes.code === ResultEnum.SUCCESS) {
-    // await updateProjectApi({
-    //   id: fetchRouteParamsLocation(),
-    //   indexImage: uploadRes.data.objectContent.httpRequest.uri
-    // })
-    // }
+    if(uploadRes.code === ResultEnum.SUCCESS) {
+      await updateProjectApi({
+        id: fetchRouteParamsLocation(),
+        indexImage: uploadRes.data.objectContent.httpRequest.uri
+      })
+    }
 
     // 保存数据
     let params = new FormData()
     params.append('projectId', projectId)
     params.append('content', JSON.stringify(chartEditStore.getStorageInfo || {}))
-    console.log(params);
-    console.log(projectId);
-    console.log(JSON.stringify(chartEditStore.getStorageInfo || {}));
-    const res = await saveOneProjectLargeScreenApi(params) as unknown as ApiResponseType
+    const res= await saveProjectApi(params) as unknown as MyResponseType
 
-    if (res && res.IsOk) {
+    if (res.code === ResultEnum.SUCCESS) {
       // 成功状态
       setTimeout(() => {
         chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)

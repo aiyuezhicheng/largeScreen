@@ -2,7 +2,7 @@
   <div class="go-edit-bottom">
     <n-space>
       <!-- 历史记录 -->
-      <!-- <edit-history></edit-history> -->
+      <edit-history></edit-history>
       <!-- CTRL按键触发展示 -->
       <n-text id="keyboard-dress-show" depth="3"></n-text>
       <n-divider vertical />
@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import { reactive, ref, toRefs, watchEffect } from 'vue'
 import { icon } from '@/plugins'
-// import { EditHistory } from '../EditHistory/index'
+import { EditHistory } from '../EditHistory/index'
 import { EditShortcutKey } from '../EditShortcutKey/index'
 import { EditDataSync } from '../EditDataSync/index'
 import { useDesignStore } from '@/store/modules/designStore/designStore'

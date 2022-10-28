@@ -12,15 +12,6 @@ export const projectListApi = async (data: object) => {
   }
 }
 
-// * 项目大屏列表
-export const projectLargeScreenListApi = async () => {
-  try { 
-    const res = await http(RequestHttpEnum.GET)(`CustomData/GetAll?docName=ProjectLargeScreen`);
-    return res;
-  } catch {
-    httpErrorHandle();
-  }
-}
 
 // * 新增项目
 export const createProjectApi = async (data: object) => {
@@ -87,6 +78,56 @@ export const changeProjectReleaseApi = async (data: object) => {
 export const uploadFile = async (url:string, data: object) => {
   try { 
     const res = await http(RequestHttpEnum.POST)(url, data, ContentTypeEnum.FORM_DATA);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 项目大屏列表
+export const projectLargeScreenListApi = async () => {
+  try { 
+    const res = await http(RequestHttpEnum.GET)(`CustomData/GetAll?docName=ProjectLargeScreen`);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 新增项目
+export const createProjectLargeScreenApi = async (data: object) => {
+  try { 
+    const res = await http(RequestHttpEnum.POST)(`CustomData/Create?docName=ProjectLargeScreen`, { Data: JSON.stringify(data) });
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 删除项目
+export const deleteProjectLargeScreenApi = async (id: string) => {
+  try { 
+    const res = await http(RequestHttpEnum.DELETE)(`CustomData/Delete?docName=ProjectLargeScreen&id=${id}`);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 获取项目
+export const fetchOneProjectLargeScreenApi = async (id: string) => {
+  try { 
+    const res = await http(RequestHttpEnum.GET)(`CustomData/GetByID?docName=ProjectLargeScreen&id=${id}`);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 保存项目
+export const saveOneProjectLargeScreenApi = async (data: object) => {
+  try { 
+    const res = await http(RequestHttpEnum.PUT)(`CustomData/Modify?docName={docName}`,  { Data: JSON.stringify(data) }, ContentTypeEnum.FORM_URLENCODED);
     return res;
   } catch {
     httpErrorHandle();

@@ -39,8 +39,8 @@ import { watch } from 'vue'
 import { icon } from '@/plugins'
 import { PageEnum, ChartEnum } from '@/enums/pageEnum'
 import { ResultEnum } from '@/enums/httpEnum'
-import { fetchPathByName, routerTurnByPath, renderLang, getUUID,newGuid } from '@/utils'
-import { createProjectApi } from '@/api/path'
+import { fetchPathByName, routerTurnByPath, renderLang, getUUID, newGuid } from '@/utils'
+import { createProjectApi, createProjectLargeScreenApi } from '@/api/path'
 
 const { FishIcon, CloseIcon } = icon.ionicons5
 const { StoreIcon, ObjectStorageIcon } = icon.carbon
@@ -88,39 +88,39 @@ const btnHandle = async (key: string) => {
   console.log(key)
   switch (key) {
     case ChartEnum.CHART_HOME_NAME:
-    const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
-    const id = newGuid() as string
-    routerTurnByPath(path, [id], undefined, true)
-    closeHandle()
-      // try {
+      // const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
+      // const id = newGuid() as string
+      // routerTurnByPath(path, [id], undefined, true)
+      // closeHandle()
+      try {
         // 新增项目
-        // const res = await createProjectApi({
-        //   // 项目名称
-        //   projectName: getUUID(),
-        //   // remarks
-        //   remarks: null,
-        //   // 图片地址
-        //   indexImage: null,
-        // }) as unknown as MyResponseType
-        // if(res.code === ResultEnum.SUCCESS) {
-        //   window['$message'].success(window['$t']('project.create_success'))
-
-        //   const { id } = res.data
-        //   const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
-        //   routerTurnByPath(path, [id], undefined, true)
-        //   closeHandle()
-        // }
-      // } catch (error) {
-      //   window['$message'].error(window['$t']('project.create_failure'))
-      // }
-      break;
+        const res = (await createProjectLargeScreenApi({
+          // 项目名称
+          projectName: getUUID(),
+          // remarks
+          remarks: null,
+          // 图片地址
+          indexImage: null
+        })) as unknown as ApiResponseType
+        const { IsOk, ErrorMsg, Response } = res
+        if (IsOk) {
+          window['$message'].success(window['$t']('project.create_success'))
+          const id = Response
+          const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
+          routerTurnByPath(path, [id], undefined, true)
+          closeHandle()
+        }
+      } catch (error) {
+        window['$message'].error(window['$t']('project.create_failure'))
+      }
+      break
   }
 }
 </script>
 <style lang="scss" scoped>
 $cardWidth: 570px;
 
-@include go("create-modal") {
+@include go('create-modal') {
   position: fixed;
   top: 200px;
   left: 50%;
@@ -131,7 +131,7 @@ $cardWidth: 570px;
     border: 1px solid rgba(0, 0, 0, 0);
     @extend .go-transition;
     &:hover {
-      @include hover-border-color("hover-border-color");
+      @include hover-border-color('hover-border-color');
     }
     &-tite {
       font-size: 14px;

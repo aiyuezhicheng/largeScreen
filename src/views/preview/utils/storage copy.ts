@@ -2,7 +2,7 @@ import { getSessionStorage, fetchRouteParamsLocation, httpErrorHandle } from '@/
 import { ResultEnum } from '@/enums/httpEnum'
 import { StorageEnum } from '@/enums/storageEnum'
 import { ChartEditStorage } from '@/store/modules/chartEditStore/chartEditStore.d'
-import { fetchOneProjectLargeScreenApi } from '@/api/path'
+import { fetchProjectApi } from '@/api/path'
 
 export interface ChartEditStorageType extends ChartEditStorage {
   id: string
@@ -14,11 +14,11 @@ export const getSessionStorageInfo = async () => {
   const storageList: ChartEditStorageType[] = getSessionStorage(
     StorageEnum.GO_CHART_STORAGE_LIST
   )
-
+  
   // 是否本地预览
   if (!storageList || storageList.findIndex(e => e.id === id.toString()) === -1) {
     // 接口调用
-    const res = await fetchOneProjectLargeScreenApi(id) as unknown as MyResponseType
+    const res = await fetchProjectApi({ projectId: id }) as unknown as MyResponseType
     if (res.code === ResultEnum.SUCCESS) {
       const { content, state } = res.data
       if (state === -1) {

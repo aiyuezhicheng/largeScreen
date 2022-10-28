@@ -1,7 +1,7 @@
 import { ref, reactive } from 'vue';
 import { goDialog, httpErrorHandle } from '@/utils'
 import { DialogEnum } from '@/enums/pluginEnum'
-import { projectLargeScreenListApi, deleteProjectApi, changeProjectReleaseApi } from '@/api/path'
+import { projectLargeScreenListApi, deleteProjectLargeScreenApi, changeProjectReleaseApi } from '@/api/path'
 import { Chartype, ChartList } from '../../..'
 import { ResultEnum } from '@/enums/httpEnum'
 
@@ -14,7 +14,7 @@ export const useDataListInit = () => {
     // 当前页数 
     page: 1,
     // 每页值
-    limit: 12,
+    limit: 2,
     // 总数
     count: 10,
   })
@@ -26,26 +26,29 @@ export const useDataListInit = () => {
     loading.value = true
     const res = await projectLargeScreenListApi() as any
     console.log(res);
-    const { IsOk, Response, ErrorMsg } = res
-    if (IsOk) {
-      paginat.count = Response && Response.length ? Response.length : 0;
-      list.value = Response.map((e: any) => {
-        const { id, projectName, state, createTime, indexImage, createUserId } = e
-        return {
-          id: id,
-          title: projectName,
-          createId: createUserId,
-          time: createTime,
-          image: indexImage,
-          release: state !== -1
-        }
-      })
-      setTimeout(() => {
-        loading.value = false
-      }, 500)
-      return
+    if (res) {
+      const { IsOk, Response, ErrorMsg } = res
+      if (IsOk) {
+        paginat.count = Response && Response.length ? Response.length : 0;
+        list.value = Response.map((e: any) => {
+          var obj = JSON.parse(e);
+          const { id, projectName, state, createTime, indexImage, createUserId } = obj
+          return {
+            id: id,
+            title: projectName,
+            createId: createUserId,
+            time: createTime,
+            image: indexImage,
+            release: state !== -1
+          }
+        })
+        setTimeout(() => {
+          loading.value = false
+        }, 500)
+        return
+      }
+      httpErrorHandle(ErrorMsg)
     }
-    httpErrorHandle(ErrorMsg)
   }
 
   // 修改页数
@@ -66,9 +69,7 @@ export const useDataListInit = () => {
       type: DialogEnum.DELETE,
       promise: true,
       onPositiveCallback: () => new Promise(res => {
-        res(deleteProjectApi({
-          ids: cardData.id
-        }))
+        res(deleteProjectLargeScreenApi(cardData.id as string))
       }),
       promiseResCallback: (res: any) => {
         if (res.code === ResultEnum.SUCCESS) {
