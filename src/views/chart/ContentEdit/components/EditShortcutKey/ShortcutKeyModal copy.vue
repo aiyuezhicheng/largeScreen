@@ -1,18 +1,35 @@
 <template>
-  <n-modal v-model:show="modelShow" preset="dialog" :mask-closable="true" @afterLeave="closeHandle"  title="快捷键">
-    <n-data-table
-    :columns="columns"
-    :data="shortcutKeyOptions"
-    :max-height="500"
-    class="model-content"
-  />
-     
+  <n-modal v-model:show="modelShow" :mask-closable="true" @afterLeave="closeHandle">
+    <n-table class="model-content" :bordered="false" :single-line="false">
+      <thead>
+        <tr>
+          <th>功能</th>
+          <th>Win 快捷键</th>
+          <th>
+            <n-space justify="space-between">
+              <span> Mac 快捷键 </span>
+              <n-icon size="20" class="go-cursor-pointer" @click="closeHandle">
+                <close-icon></close-icon>
+              </n-icon>
+            </n-space>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in shortcutKeyOptions" :key="index">
+          <td>{{ item.label }}</td>
+          <td>{{ item.win }}</td>
+          <td>
+            <n-gradient-text :size="22">{{ item.mac.substr(0, 1) }}</n-gradient-text>
+            + {{ item.mac.substr(3) }}
+          </td>
+        </tr>
+      </tbody>
+    </n-table>
   </n-modal>
 </template>
 
 <script setup lang="ts">
-import { h } from 'vue'
-import { NIcon ,NButton} from 'naive-ui'
 import { icon } from '@/plugins'
 import { WinKeyboard, MacKeyboard } from '@/enums/editPageEnum'
 
@@ -23,20 +40,6 @@ const emit = defineEmits(['update:modelShow'])
 defineProps({
   modelShow: Boolean
 })
-const columns = [
-  {
-    title: '功能',
-    key: 'label'
-  },
-  {
-    title: 'Win 快捷键',
-    key: 'win'
-  },
-  {
-    key: 'mac',
-    title:'Mac 快捷键'
-  }
-]
 
 // 快捷键
 const shortcutKeyOptions = [
@@ -113,7 +116,7 @@ const shortcutKeyOptions = [
   {
     label: '保存',
     win: `${WinKeyboard.CTRL.toUpperCase()} + S `,
-    mac: `${MacKeyboard.CTRL.toUpperCase()} + S `
+    mac: `${MacKeyboard.CTRL.toUpperCase()} + S `,
   },
   {
     label: '多选',
@@ -137,4 +140,13 @@ const closeHandle = () => {
 </script>
 
 <style lang="scss" scoped>
+.model-content {
+  width: 50vw;
+  padding-bottom: 20px;
+  overflow: hidden;
+  border-radius: 15px;
+  td {
+    padding: 5px 10px;
+  }
+}
 </style>

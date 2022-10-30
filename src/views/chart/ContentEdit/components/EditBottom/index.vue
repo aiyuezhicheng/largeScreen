@@ -6,7 +6,7 @@
       <!-- CTRL按键触发展示 -->
       <n-text id="keyboard-dress-show" depth="3"></n-text>
       <n-divider vertical />
-      <edit-data-sync></edit-data-sync>
+      <!-- <edit-data-sync></edit-data-sync> -->
     </n-space>
 
     <n-space class="bottom-ri">
@@ -58,7 +58,7 @@ import { reactive, ref, toRefs, watchEffect } from 'vue'
 import { icon } from '@/plugins'
 // import { EditHistory } from '../EditHistory/index'
 import { EditShortcutKey } from '../EditShortcutKey/index'
-import { EditDataSync } from '../EditDataSync/index'
+// import { EditDataSync } from '../EditDataSync/index'
 import { useDesignStore } from '@/store/modules/designStore/designStore'
 import { useChartEditStore } from '@/store/modules/chartEditStore/chartEditStore'
 import { EditCanvasTypeEnum } from '@/store/modules/chartEditStore/chartEditStore.d'

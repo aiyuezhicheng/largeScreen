@@ -177,7 +177,7 @@ export const useSync = () => {
         const { Response } = res
         if (Response) {
           const result = JSON.parse(Response)
-          updateStoreInfo(result)
+          updateStoreInfo({ ...result, id: fetchRouteParamsLocation() })
           // 更新全局数据
           if (result && result.content)
             await updateComponent(JSON.parse(result.content))
@@ -236,12 +236,18 @@ export const useSync = () => {
     // }
 
     // 保存数据
-    let params = new FormData()
-    params.append('projectId', projectId)
-    params.append('content', JSON.stringify(chartEditStore.getStorageInfo || {}))
-    console.log(params);
-    console.log(projectId);
-    console.log(JSON.stringify(chartEditStore.getStorageInfo || {}));
+    // let params = new FormData()
+    // params.append('projectId', projectId)
+    // params.append('content', JSON.stringify(chartEditStore.getStorageInfo || {}))
+
+    let params = {
+      content: JSON.stringify(chartEditStore.getStorageInfo || {}),
+      id: projectId,
+      ID: projectId,
+      projectName: chartEditStore.getProjectInfo[ProjectInfoEnum.PROJECT_NAME],
+      lastModifyTime: new Date().getTime(),
+      indexImage: canvasImage.toDataURL()
+    }
     const res = await saveOneProjectLargeScreenApi(params) as unknown as ApiResponseType
 
     if (res && res.IsOk) {
@@ -249,10 +255,12 @@ export const useSync = () => {
       setTimeout(() => {
         chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)
       }, 1000)
+      window['$message'].success('保存成功!')
       return
     }
     // 失败状态
     chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
+    window['$message'].error('保存失败!')
   }, 3000)
 
   // * 定时处理

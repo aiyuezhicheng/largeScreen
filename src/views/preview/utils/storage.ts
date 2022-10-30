@@ -18,17 +18,26 @@ export const getSessionStorageInfo = async () => {
   // 是否本地预览
   if (!storageList || storageList.findIndex(e => e.id === id.toString()) === -1) {
     // 接口调用
-    const res = await fetchOneProjectLargeScreenApi(id) as unknown as MyResponseType
-    if (res.code === ResultEnum.SUCCESS) {
-      const { content, state } = res.data
-      if (state === -1) {
-        // 跳转未发布页
-        return { isRelease: false }
+    const res = await fetchOneProjectLargeScreenApi(id) as unknown as ApiResponseType
+    const { IsOk, ErrorMsg, Response } = res
+    if (IsOk) {
+      if (Response) {
+        var obj = JSON.parse(Response)
+        return { ...JSON.parse(obj.content), id }
       }
-      return { ...JSON.parse(content), id }
     } else {
-      httpErrorHandle()
+      httpErrorHandle(ErrorMsg)
     }
+    // if (res.code === ResultEnum.SUCCESS) {
+    //   const { content, state } = res.data
+    //   if (state === -1) {
+    //     // 跳转未发布页
+    //     return { isRelease: false }
+    //   }
+    //   return { ...JSON.parse(content), id }
+    // } else {
+    //   
+    // }
   } else {
     // 本地读取
     for (let i = 0; i < storageList.length; i++) {

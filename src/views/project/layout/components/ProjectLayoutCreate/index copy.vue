@@ -32,11 +32,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useDesignStore } from '@/store/modules/designStore/designStore'
-import { fetchPathByName, routerTurnByPath, renderLang, getUUID, newGuid } from '@/utils'
-import { ChartEnum } from '@/enums/pageEnum'
 import { CreateModal } from './components/CreateModal/index'
-import { createProjectApi, createProjectLargeScreenApi } from '@/api/path'
-
 import { icon } from '@/plugins'
 
 const { DuplicateIcon, DuplicateOutlineIcon } = icon.ionicons5
@@ -55,33 +51,4 @@ const clickHandle = () => {
 const closeHandle = () => {
   modalShow.value = false
 }
-
-// 跳转新建
-// const clickHandle =  async () => {
-// //   const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'fullPath')
-// //   const id = getUUID()
-// //   routerTurnByPath(path, [id])
-
-//    try {
-//         // 新增项目
-//         const res = (await createProjectLargeScreenApi({
-//           // 项目名称
-//           projectName: getUUID(),
-//           // remarks
-//           remarks: null,
-//           // 图片地址
-//           indexImage: null
-//         })) as unknown as ApiResponseType
-//         const { IsOk, ErrorMsg, Response } = res
-//         if (IsOk) {
-//           window['$message'].success(window['$t']('project.create_success'))
-//           const id = Response
-//           const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
-//           routerTurnByPath(path, [id])
-
-//         }
-//       } catch (error) {
-//         window['$message'].error(window['$t']('project.create_failure'))
-//       }
-// }
 </script>

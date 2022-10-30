@@ -85,13 +85,8 @@ const closeHandle = () => {
 
 // 处理按钮点击
 const btnHandle = async (key: string) => {
-  console.log(key)
   switch (key) {
     case ChartEnum.CHART_HOME_NAME:
-      // const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
-      // const id = newGuid() as string
-      // routerTurnByPath(path, [id], undefined, true)
-      // closeHandle()
       try {
         // 新增项目
         const res = (await createProjectLargeScreenApi({
@@ -107,7 +102,7 @@ const btnHandle = async (key: string) => {
           window['$message'].success(window['$t']('project.create_success'))
           const id = Response
           const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
-          routerTurnByPath(path, [id], undefined, true)
+          routerTurnByPath(path, [id])
           closeHandle()
         }
       } catch (error) {

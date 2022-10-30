@@ -105,7 +105,7 @@ export const createProjectLargeScreenApi = async (data: object) => {
 }
 
 // * 删除项目
-export const deleteProjectLargeScreenApi = async (id: string) => {
+export const deleteOneProjectLargeScreenApi = async (id: string) => {
   try { 
     const res = await http(RequestHttpEnum.DELETE)(`CustomData/Delete?docName=ProjectLargeScreen&id=${id}`);
     return res;
@@ -127,7 +127,7 @@ export const fetchOneProjectLargeScreenApi = async (id: string) => {
 // * 保存项目
 export const saveOneProjectLargeScreenApi = async (data: object) => {
   try { 
-    const res = await http(RequestHttpEnum.PUT)(`CustomData/Modify?docName={docName}`,  { Data: JSON.stringify(data) }, ContentTypeEnum.FORM_URLENCODED);
+    const res = await http(RequestHttpEnum.PUT)(`CustomData/Modify?docName=ProjectLargeScreen`,  { Data: JSON.stringify(data) });
     return res;
   } catch {
     httpErrorHandle();

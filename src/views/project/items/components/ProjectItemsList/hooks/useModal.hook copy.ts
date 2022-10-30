@@ -22,8 +22,8 @@ export const useModalDataInit = () => {
   // 编辑处理
   const editHandle = (cardData: Chartype) => {
     if (!cardData) return
-    const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'fullPath')
-    routerTurnByPath(path, [cardData.id])
+    const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'href')
+    routerTurnByPath(path, [cardData.id], undefined, true)
   }
 
   // 预览处理

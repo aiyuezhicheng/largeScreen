@@ -22,7 +22,7 @@
       </div>
 
       <!-- 分页 -->
-      <div class="list-pagination">
+      <!-- <div class="list-pagination">
         <n-pagination
           :page="paginat.page"
           :page-size="paginat.limit"
@@ -32,7 +32,7 @@
           @update:page-size="changeSize"
           show-size-picker
         />
-      </div>
+      </div> -->
     </div>
     <n-space vertical v-else class="go-items-list-none">
       <n-image object-fit="contain" height="300" preview-disabled :src="requireErrorImg()"></n-image>

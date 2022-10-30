@@ -1,7 +1,7 @@
 import { ref, reactive } from 'vue';
 import { goDialog, httpErrorHandle } from '@/utils'
 import { DialogEnum } from '@/enums/pluginEnum'
-import { projectLargeScreenListApi, deleteProjectLargeScreenApi, changeProjectReleaseApi } from '@/api/path'
+import { projectLargeScreenListApi, deleteOneProjectLargeScreenApi, changeProjectReleaseApi } from '@/api/path'
 import { Chartype, ChartList } from '../../..'
 import { ResultEnum } from '@/enums/httpEnum'
 
@@ -32,9 +32,9 @@ export const useDataListInit = () => {
         paginat.count = Response && Response.length ? Response.length : 0;
         list.value = Response.map((e: any) => {
           var obj = JSON.parse(e);
-          const { id, projectName, state, createTime, indexImage, createUserId } = obj
+          const { id, projectName, state, createTime, indexImage, createUserId, ID } = obj
           return {
-            id: id,
+            id: ID || id,
             title: projectName,
             createId: createUserId,
             time: createTime,
@@ -65,11 +65,12 @@ export const useDataListInit = () => {
 
   // 删除处理
   const deleteHandle = (cardData: Chartype) => {
+    console.log(cardData)
     goDialog({
       type: DialogEnum.DELETE,
       promise: true,
       onPositiveCallback: () => new Promise(res => {
-        res(deleteProjectLargeScreenApi(cardData.id as string))
+        res(deleteOneProjectLargeScreenApi(cardData.id as string))
       }),
       promiseResCallback: (res: any) => {
         if (res.code === ResultEnum.SUCCESS) {
