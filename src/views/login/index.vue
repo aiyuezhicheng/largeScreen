@@ -18,7 +18,7 @@
     <layout-header>
       <template #left></template>
       <template #right>
-        <go-lang-select></go-lang-select>
+        <!-- <go-lang-select></go-lang-select> -->
         <go-theme-select></go-theme-select>
       </template>
     </layout-header>
@@ -97,7 +97,7 @@ import { carouselInterval } from '@/settings/designSetting'
 import { useSystemStore } from '@/store/modules/systemStore/systemStore'
 import { SystemStoreUserInfoEnum, SystemStoreEnum } from '@/store/modules/systemStore/systemStore.d'
 import { GoThemeSelect } from '@/components/GoThemeSelect'
-import { GoLangSelect } from '@/components/GoLangSelect'
+// import { GoLangSelect } from '@/components/GoLangSelect'
 import { LayoutHeader } from '@/layout/components/LayoutHeader'
 import { LayoutFooter } from '@/layout/components/LayoutFooter'
 import { PageEnum } from '@/enums/pageEnum'

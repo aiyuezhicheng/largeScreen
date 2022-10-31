@@ -1,8 +1,12 @@
 <template>
   <n-space>
-    <!-- 项目大屏 大屏模板 -->
-    <n-select v-model:value="largeScreenType" :options="largeScreenTypeOptions" :style="{ width: '100px' }" />
-    <n-button v-for="item in btnList" :key="item.key" :type="item.type()" ghost @click="item.event">
+    <n-button
+      v-for="item in btnList"
+      :key="item.key"
+      :type="item.type()"
+      ghost
+      @click="item.event"
+    >
       <template #icon>
         <component :is="item.icon"></component>
       </template>
@@ -28,7 +32,9 @@
             {{ previewPath() }}
           </n-alert>
           <n-space vertical>
-            <n-button tertiary type="primary" @click="copyPreviewPath()"> 复制地址 </n-button>
+            <n-button tertiary type="primary" @click="copyPreviewPath()">
+              复制地址
+            </n-button>
             <n-button :type="release ? 'warning' : 'primary'" @click="sendHandle">
               {{ release ? '取消发布' : '发布大屏' }}
             </n-button>
@@ -63,7 +69,7 @@ import {
   setSessionStorage,
   getLocalStorage,
   httpErrorHandle,
-  fetchRouteParamsLocation
+  fetchRouteParamsLocation,
 } from '@/utils'
 import { icon } from '@/plugins'
 
@@ -95,26 +101,31 @@ const previewHandle = () => {
   // id 标识
   const previewId = typeof id === 'string' ? id : id[0]
   const storageInfo = chartEditStore.getStorageInfo
-  const sessionStorageInfo = getLocalStorage(StorageEnum.GO_CHART_STORAGE_LIST) || []
+  const sessionStorageInfo =
+    getLocalStorage(StorageEnum.GO_CHART_STORAGE_LIST) || []
 
   if (sessionStorageInfo?.length) {
-    const repeateIndex = sessionStorageInfo.findIndex((e: { id: string }) => e.id === previewId)
+    const repeateIndex = sessionStorageInfo.findIndex(
+      (e: { id: string }) => e.id === previewId
+    )
     // 重复替换
     if (repeateIndex !== -1) {
       sessionStorageInfo.splice(repeateIndex, 1, {
         id: previewId,
-        ...storageInfo
+        ...storageInfo,
       })
       setSessionStorage(StorageEnum.GO_CHART_STORAGE_LIST, sessionStorageInfo)
     } else {
       sessionStorageInfo.push({
         id: previewId,
-        ...storageInfo
+        ...storageInfo,
       })
       setSessionStorage(StorageEnum.GO_CHART_STORAGE_LIST, sessionStorageInfo)
     }
   } else {
-    setSessionStorage(StorageEnum.GO_CHART_STORAGE_LIST, [{ id: previewId, ...storageInfo }])
+    setSessionStorage(StorageEnum.GO_CHART_STORAGE_LIST, [
+      { id: previewId, ...storageInfo },
+    ])
   }
   // 跳转
   routerTurnByPath(path, [previewId], undefined, true)
@@ -140,7 +151,7 @@ const sendHandle = async () => {
   const res = (await updateProjectApi({
     id: fetchRouteParamsLocation(),
     // 反过来
-    state: release.value ? -1 : 1
+    state: release.value ? -1 : 1,
   })) as unknown as MyResponseType
 
   if (res.code === ResultEnum.SUCCESS) {
@@ -162,28 +173,16 @@ const btnList = shallowReactive([
     title: () => '预览',
     type: () => 'default',
     icon: renderIcon(BrowsersOutlineIcon),
-    event: previewHandle
+    event: previewHandle,
   },
   {
     key: 'release',
     title: () => (release.value ? '已发布' : '发布'),
     icon: renderIcon(SendIcon),
     type: () => (release.value ? 'primary' : 'default'),
-    event: modelShowHandle
-  }
-])
-
-const largeScreenType = ref('projectLargeScreen')
-const largeScreenTypeOptions = [
-  {
-    value: 'projectLargeScreen',
-    label: '项目'
+    event: modelShowHandle,
   },
-  {
-    value: 'largeScreenTemplate',
-    label: '模板'
-  }
-]
+])
 </script>
 
 <style lang="scss" scoped>

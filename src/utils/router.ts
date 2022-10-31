@@ -83,6 +83,33 @@ export const routerTurnByPath = (
 }
 
 /**
+ * * 根据路径和参数跳转路由
+ * @param path
+ * @param query
+ * @param isReplace
+ * @param windowOpen
+ */
+ export const routerTurnByPathAndParams = (
+  path: string,
+  query?: Array<string | number>,
+  isReplace?: boolean,
+  windowOpen?: boolean,
+) => {
+  let fullPath = ''
+  if (query?.length) {
+    fullPath = `${path}/${query.join('/')}`
+  }
+  if (windowOpen) {
+    return openNewWindow(fullPath)
+  }
+  if (isReplace) {
+    router.replace(fullPath)
+    return
+  }
+  router.push(fullPath)
+}
+
+/**
  * * 错误页重定向
  * @param icon
  * @returns

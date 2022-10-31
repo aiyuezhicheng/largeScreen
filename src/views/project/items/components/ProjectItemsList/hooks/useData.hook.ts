@@ -32,14 +32,15 @@ export const useDataListInit = () => {
         paginat.count = Response && Response.length ? Response.length : 0;
         list.value = Response.map((e: any) => {
           var obj = JSON.parse(e);
-          const { id, projectName, state, createTime, indexImage, createUserId, ID } = obj
+          const { id, projectName, state, createTime, indexImage, createUserId, ID, content } = obj
           return {
             id: ID || id,
             title: projectName,
             createId: createUserId,
             time: createTime,
             image: indexImage,
-            release: state !== -1
+            release: state !== -1,
+            content: content
           }
         })
         setTimeout(() => {

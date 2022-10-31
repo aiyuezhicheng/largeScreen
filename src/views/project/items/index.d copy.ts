@@ -6,7 +6,6 @@ export type Chartype = {
   image: string, // 预览图地址
   createId: string, // 创建者
   release: boolean // false 未发布 | true 已发布
-  content: string // 画布内容
 }
 
 export type ChartList = Chartype[]

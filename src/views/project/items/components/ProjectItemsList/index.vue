@@ -16,6 +16,9 @@
               @delete="deleteHandle(item)"
               @release="releaseHandle(item, index)"
               @edit="editHandle"
+              @download="downloadHandle"
+              @copy="cloneHandle"
+              @rename="openRenameModal"
             ></project-items-card>
           </n-grid-item>
         </n-grid>
@@ -48,18 +51,40 @@
     @close="closeModal"
     @edit="editHandle"
   ></project-items-modal-card>
+  <!-- 重命名 -->
+  <project-items-modal-rename
+    v-if="modalData"
+    v-model:modalRenameShow="modalRenameShow"
+    :cardData="modalData"
+    @close="closeRenameModal"
+    @edit="renameHandle"
+  ></project-items-modal-rename>
 </template>
 
 <script setup lang="ts">
 import { ProjectItemsCard } from '../ProjectItemsCard/index'
 import { ProjectItemsModalCard } from '../ProjectItemsModalCard/index'
+import { ProjectItemsModalRename } from '../ProjectItemsModalRename/index'
 import { icon } from '@/plugins'
 import { useModalDataInit } from './hooks/useModal.hook'
 import { useDataListInit } from './hooks/useData.hook'
 import { requireErrorImg } from '@/utils'
 
 const { CopyIcon, EllipsisHorizontalCircleSharpIcon } = icon.ionicons5
-const { modalData, modalShow, closeModal, previewHandle, resizeHandle, editHandle } = useModalDataInit()
+const {
+  modalData,
+  modalShow,
+  closeModal,
+  previewHandle,
+  resizeHandle,
+  editHandle,
+  downloadHandle,
+  cloneHandle,
+  openRenameModal,
+  modalRenameShow,
+  closeRenameModal,
+  renameHandle
+} = useModalDataInit()
 const { loading, paginat, list, changeSize, changePage, releaseHandle, deleteHandle } = useDataListInit()
 </script>
 

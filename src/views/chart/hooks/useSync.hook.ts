@@ -1,6 +1,6 @@
 import { onUnmounted } from 'vue';
 import html2canvas from 'html2canvas'
-import { getUUID, httpErrorHandle, fetchRouteParamsLocation, base64toFile } from '@/utils'
+import { getUUID, httpErrorHandle, fetchRouteParamsLocation, base64toFile, fetchRouteParams, isNotEmptyGuid, fetchPathByName, routerTurnByPathAndParams } from '@/utils'
 import { useChartEditStore } from '@/store/modules/chartEditStore/chartEditStore'
 import { EditCanvasTypeEnum, ChartEditStoreEnum, ProjectInfoEnum, ChartEditStorage } from '@/store/modules/chartEditStore/chartEditStore.d'
 import { useChartHistoryStore } from '@/store/modules/chartHistoryStore/chartHistoryStore'
@@ -11,12 +11,13 @@ import throttle from 'lodash/throttle'
 // 接口状态
 import { ResultEnum } from '@/enums/httpEnum'
 // 接口
-import { saveOneProjectLargeScreenApi, fetchOneProjectLargeScreenApi, uploadFile, updateProjectApi } from '@/api/path'
+import { saveOneProjectLargeScreenApi, fetchOneProjectLargeScreenApi, uploadFile, updateProjectApi, createProjectLargeScreenApi } from '@/api/path'
 // 画布枚举
 import { SyncEnum } from '@/enums/editPageEnum'
 import { CreateComponentType, CreateComponentGroupType, ConfigType } from '@/packages/index.d'
 import { PublicGroupConfigClass } from '@/packages/public/publicConfig'
 import merge from 'lodash/merge'
+import { ChartEnum } from '@/enums/pageEnum'
 
 /**
  * 合并处理
@@ -172,25 +173,41 @@ export const useSync = () => {
   const dataSyncFetch = async () => {
     chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.START)
     try {
-      const res = await fetchOneProjectLargeScreenApi(fetchRouteParamsLocation()) as unknown as ApiResponseType
-      if (res && res.IsOk) {
-        const { Response } = res
-        if (Response) {
-          const result = JSON.parse(Response)
-          updateStoreInfo({ ...result, id: fetchRouteParamsLocation() })
-          // 更新全局数据
-          if (result && result.content)
-            await updateComponent(JSON.parse(result.content))
-          return
-        } else {
-          chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, fetchRouteParamsLocation())
-        }
-        setTimeout(() => {
-          chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)
-        }, 1000)
-        return
+      const params = fetchRouteParams();
+      let id = params?.id[0];
+      let action = 'edit';
+      const path = fetchRouteParamsLocation()
+      if (path.indexOf('?action=') > -1) {
+        const index = path.indexOf('?action=')
+        action = path.substring(index + 8)
+        id = path.substring(0, index)
       }
-      chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
+
+      const projectid = action == 'edit' ? id : getUUID();
+      if (id && isNotEmptyGuid(id)) { // 编辑和克隆
+        const res = await fetchOneProjectLargeScreenApi(id) as unknown as ApiResponseType
+        if (res && res.IsOk) {
+          const { Response } = res
+          if (Response) {
+            const result = JSON.parse(Response)
+            updateStoreInfo({ ...result, id: projectid })
+            // 更新全局数据
+            if (result && result.content)
+              await updateComponent(JSON.parse(result.content),true)
+            return
+          } else {
+            chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, projectid as string)
+          }
+          setTimeout(() => {
+            chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)
+          }, 1000)
+          return
+        }
+        chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
+      } else {
+        chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, projectid as string)
+        chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_NAME,getUUID())
+      }
     } catch (error) {
       chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
       httpErrorHandle()
@@ -200,11 +217,6 @@ export const useSync = () => {
   // * 数据保存
   const dataSyncUpdate = throttle(async () => {
     if (!fetchRouteParamsLocation()) return
-
-    // if (!systemStore.getFetchInfo.OSSUrl) {
-    //   window['$message'].error('数据保存失败，请刷新页面重试！')
-    //   return
-    // }
 
     let projectId = chartEditStore.getProjectInfo[ProjectInfoEnum.PROJECT_ID];
     if (projectId === null || projectId === '') {
@@ -240,27 +252,55 @@ export const useSync = () => {
     // params.append('projectId', projectId)
     // params.append('content', JSON.stringify(chartEditStore.getStorageInfo || {}))
 
+    const routParams = fetchRouteParams();
+    let id = routParams?.id[0];
+    let action = 'edit';
+    const path = fetchRouteParamsLocation()
+    if (path.indexOf('?action=') > -1) {
+      const index = path.indexOf('?action=')
+      action = path.substring(index + 8)
+      id = path.substring(0, index)
+    }
+
     let params = {
       content: JSON.stringify(chartEditStore.getStorageInfo || {}),
-      id: projectId,
-      ID: projectId,
+      // ID: projectId,
       projectName: chartEditStore.getProjectInfo[ProjectInfoEnum.PROJECT_NAME],
       lastModifyTime: new Date().getTime(),
       indexImage: canvasImage.toDataURL()
     }
-    const res = await saveOneProjectLargeScreenApi(params) as unknown as ApiResponseType
+    if (id && isNotEmptyGuid(id) && action == 'edit') {
+      const res = await saveOneProjectLargeScreenApi({ ...params, ID: projectId, id: projectId }) as unknown as ApiResponseType
+      if (res && res.IsOk) {
+        // 成功状态
+        setTimeout(() => {
+          chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)
+        }, 1000)
+        window['$message'].success('保存成功!')
+        return
+      }
+      // 失败状态
+      chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
+      window['$message'].error('保存失败!')
+    } else { // 克隆和新建
 
-    if (res && res.IsOk) {
-      // 成功状态
-      setTimeout(() => {
-        chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)
-      }, 1000)
-      window['$message'].success('保存成功!')
-      return
+      const res = await createProjectLargeScreenApi({ ...params }) as unknown as ApiResponseType
+      if (res && res.IsOk) {
+        chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, res.Response)
+        // 成功状态
+        setTimeout(() => {
+          chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.SUCCESS)
+        }, 1000)
+        window['$message'].success('创建成功!')
+        const path = fetchPathByName(ChartEnum.CHART_HOME_NAME, 'fullPath')
+        const id = res.Response + '?action=edit'
+        routerTurnByPathAndParams(path, [id], true)
+        return
+      }
+      // 失败状态
+      chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
+      window['$message'].error('保存失败!')
     }
-    // 失败状态
-    chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
-    window['$message'].error('保存失败!')
   }, 3000)
 
   // * 定时处理

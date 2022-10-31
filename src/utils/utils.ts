@@ -41,6 +41,33 @@ export const newGuid = () => {
   return guid
 }
 
+export const guidEmpty = "00000000-0000-0000-0000-000000000000";
+
+/**
+ * * 判断一个不重复的ID
+ */
+export const isNotEmptyGuid = (value?: string) => {
+  if (isGuid(value)) {
+    if (value == guidEmpty)
+      return false;
+    else
+      return true;
+  }
+  else
+    return false;
+}
+
+/**
+ * * 判断一个不重复的ID
+ */
+export const isGuid = (value?: string) => {
+  if (value && value.length == 36) {
+    var re = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    return re.test(value);
+  }
+  return false;
+}
+
 /**
  * * render 图标
  *  @param icon 图标
