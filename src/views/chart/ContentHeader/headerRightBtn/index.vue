@@ -1,7 +1,21 @@
 <template>
   <n-space>
     <!-- 项目大屏 大屏模板 -->
-    <n-select v-model:value="largeScreenType" :options="largeScreenTypeOptions" :style="{ width: '100px' }" />
+    <n-select
+      v-model:value="largeScreenType"
+      :options="[
+        {
+          value: 'projectLargeScreen',
+          label: '项目'
+        },
+        {
+          value: 'largeScreenTemplate',
+          label: '模板'
+        }
+      ]"
+      :style="{ width: '100px' }"
+      @update:value="selectSourceHandle"
+    />
     <n-button v-for="item in btnList" :key="item.key" :type="item.type()" ghost @click="item.event">
       <template #icon>
         <component :is="item.icon"></component>
@@ -174,16 +188,13 @@ const btnList = shallowReactive([
 ])
 
 const largeScreenType = ref('projectLargeScreen')
-const largeScreenTypeOptions = [
-  {
-    value: 'projectLargeScreen',
-    label: '项目'
-  },
-  {
-    value: 'largeScreenTemplate',
-    label: '模板'
-  }
-]
+const selectSourceHandle = (v: string) => {
+  chartEditStore.setProjectInfo(ProjectInfoEnum.SOURCE, v)
+}
+
+watchEffect(() => {
+  largeScreenType.value = chartEditStore.getProjectInfo.source || 'projectLargeScreen'
+})
 </script>
 
 <style lang="scss" scoped>

@@ -154,9 +154,12 @@ export const useSync = () => {
     projectName: string,
     indexImage: string,
     remarks: string,
-    state: number
+    state: number,
+    source: string,
+    createTime: string
+    createUserId: string
   }) => {
-    const { id, projectName, remarks, indexImage, state } = projectData
+    const { id, projectName, remarks, indexImage, state, source, createTime, createUserId } = projectData
     // ID
     chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, id)
     // 名称
@@ -167,6 +170,12 @@ export const useSync = () => {
     chartEditStore.setProjectInfo(ProjectInfoEnum.THUMBNAIL, indexImage)
     // 发布
     chartEditStore.setProjectInfo(ProjectInfoEnum.RELEASE, state === 1)
+    // 来源
+    chartEditStore.setProjectInfo(ProjectInfoEnum.SOURCE, source)
+    // 创建时间
+    chartEditStore.setProjectInfo(ProjectInfoEnum.CREATETIME, createTime)
+    // 创建人ID
+    chartEditStore.setProjectInfo(ProjectInfoEnum.CREATEUSERID, createUserId)
   }
 
   // * 数据获取
@@ -193,7 +202,7 @@ export const useSync = () => {
             updateStoreInfo({ ...result, id: projectid })
             // 更新全局数据
             if (result && result.content)
-              await updateComponent(JSON.parse(result.content),true)
+              await updateComponent(JSON.parse(result.content), true)
             return
           } else {
             chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, projectid as string)
@@ -206,7 +215,8 @@ export const useSync = () => {
         chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
       } else {
         chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, projectid as string)
-        chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_NAME,getUUID())
+        chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_NAME, projectid as string)
+        chartEditStore.setProjectInfo(ProjectInfoEnum.SOURCE, 'projectLargeScreen')
       }
     } catch (error) {
       chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
@@ -267,10 +277,14 @@ export const useSync = () => {
       // ID: projectId,
       projectName: chartEditStore.getProjectInfo[ProjectInfoEnum.PROJECT_NAME],
       lastModifyTime: new Date().getTime(),
-      indexImage: canvasImage.toDataURL()
+      indexImage: canvasImage.toDataURL(),
+      source: chartEditStore.getProjectInfo[ProjectInfoEnum.SOURCE]
     }
     if (id && isNotEmptyGuid(id) && action == 'edit') {
-      const res = await saveOneProjectLargeScreenApi({ ...params, ID: projectId, id: projectId }) as unknown as ApiResponseType
+      const createTime = chartEditStore.getProjectInfo[ProjectInfoEnum.CREATETIME]
+      const createUserId = chartEditStore.getProjectInfo[ProjectInfoEnum.CREATEUSERID]
+      // 创建人ID
+      const res = await saveOneProjectLargeScreenApi({ ...params, ID: projectId, id: projectId, createTime, createUserId }) as unknown as ApiResponseType
       if (res && res.IsOk) {
         // 成功状态
         setTimeout(() => {
@@ -283,8 +297,8 @@ export const useSync = () => {
       chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
       window['$message'].error('保存失败!')
     } else { // 克隆和新建
-
-      const res = await createProjectLargeScreenApi({ ...params }) as unknown as ApiResponseType
+      const userid = systemStore.getUserInfo.userId
+      const res = await createProjectLargeScreenApi({ ...params, createTime: new Date().getTime() + '', createUserId: userid }) as unknown as ApiResponseType
       if (res && res.IsOk) {
         chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, res.Response)
         // 成功状态

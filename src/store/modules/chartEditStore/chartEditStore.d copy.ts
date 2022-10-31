@@ -14,14 +14,6 @@ import { PreviewScaleEnum } from '@/enums/styleEnum'
 import type { ChartColorsNameType, GlobalThemeJsonType } from '@/settings/chartThemes/index'
 
 // 项目数据枚举
-export enum LargeScreenType {
-  // 大屏模板
-  TEMPLATE = 'template',
-  // 项目大屏
-  PROJECT = 'project'
-}
-
-// 项目数据枚举
 export enum ProjectInfoEnum {
   // ID
   PROJECT_ID = "projectId",
@@ -30,15 +22,9 @@ export enum ProjectInfoEnum {
   // 描述
   REMARKS = 'remarks',
   // 缩略图
-  THUMBNAIL = 'thumbnail',
+  THUMBNAIL= 'thumbnail',
   // 是否公开发布
-  RELEASE = 'release',
-  // 来源
-  SOURCE = 'source',
-  // 创建时间
-  CREATETIME = 'createTime',
-  // 创建人ID
-  CREATEUSERID = 'createUserId'
+  RELEASE = 'release'
 }
 
 // 项目数据
@@ -47,11 +33,7 @@ export type ProjectInfoType = {
   [ProjectInfoEnum.PROJECT_NAME]: string,
   [ProjectInfoEnum.REMARKS]: string,
   [ProjectInfoEnum.THUMBNAIL]: string,
-  [ProjectInfoEnum.RELEASE]: boolean,
-  [ProjectInfoEnum.SOURCE]: string,
-  [ProjectInfoEnum.CREATETIME]: string,
-  [ProjectInfoEnum.CREATEUSERID]: string,
-
+  [ProjectInfoEnum.RELEASE]: boolean
 }
 
 // 编辑画布属性

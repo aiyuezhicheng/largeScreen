@@ -7,6 +7,8 @@ export type Chartype = {
   createId: string, // 创建者
   release: boolean // false 未发布 | true 已发布
   content: string // 画布内容
+  createTime: string // 创建时间
+  source: string // 来源
 }
 
 export type ChartList = Chartype[]

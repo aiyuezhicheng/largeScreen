@@ -50,7 +50,10 @@ export const useChartEditStore = defineStore({
       projectName: '',
       remarks: '',
       thumbnail: '',
-      release: false
+      release: false,
+      source: 'projectLargeScreen',
+      createTime: '',
+      createUserId: ''
     },
     // 画布属性
     editCanvas: {
@@ -187,7 +190,7 @@ export const useChartEditStore = defineStore({
   },
   actions: {
     // * 设置 peojectInfo 数据项
-    setProjectInfo<T extends keyof ProjectInfoType,  K extends ProjectInfoType[T]>(key: T, value: K) {
+    setProjectInfo<T extends keyof ProjectInfoType, K extends ProjectInfoType[T]>(key: T, value: K) {
       this.projectInfo[key] = value
     },
     // * 设置 editCanvas 数据项
@@ -528,11 +531,11 @@ export const useChartEditStore = defineStore({
               item.id = getUUID()
             })
           }
-        
+
           return e
         }
         const isCut = recordCharts.type === HistoryActionTypeEnum.CUT
-        const targetList = Array.isArray(recordCharts.charts) ? recordCharts.charts : [ recordCharts.charts ]
+        const targetList = Array.isArray(recordCharts.charts) ? recordCharts.charts : [recordCharts.charts]
         // 多项
         targetList.forEach((e: CreateComponentType | CreateComponentGroupType) => {
           this.addComponentList(parseHandle(e), undefined, true)
