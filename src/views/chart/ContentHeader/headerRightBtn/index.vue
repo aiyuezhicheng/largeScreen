@@ -1,21 +1,5 @@
 <template>
   <n-space>
-    <!-- 项目大屏 大屏模板 -->
-    <n-select
-      v-model:value="largeScreenType"
-      :options="[
-        {
-          value: 'projectLargeScreen',
-          label: '项目'
-        },
-        {
-          value: 'largeScreenTemplate',
-          label: '模板'
-        }
-      ]"
-      :style="{ width: '100px' }"
-      @update:value="selectSourceHandle"
-    />
     <n-button v-for="item in btnList" :key="item.key" :type="item.type()" ghost @click="item.event">
       <template #icon>
         <component :is="item.icon"></component>
@@ -39,7 +23,7 @@
       <n-list-item>
         <n-space :size="10">
           <n-alert :show-icon="false" title="预览地址：" type="success">
-            {{ previewPath() }}
+            {{ url }}
           </n-alert>
           <n-space vertical>
             <n-button tertiary type="primary" @click="copyPreviewPath()"> 复制地址 </n-button>
@@ -65,10 +49,8 @@ import { useRoute } from 'vue-router'
 import { useClipboard } from '@vueuse/core'
 import { PreviewEnum } from '@/enums/pageEnum'
 import { StorageEnum } from '@/enums/storageEnum'
-import { ResultEnum } from '@/enums/httpEnum'
 import { useChartEditStore } from '@/store/modules/chartEditStore/chartEditStore'
 import { ProjectInfoEnum } from '@/store/modules/chartEditStore/chartEditStore.d'
-import { updateProjectApi } from '@/api/path'
 import {
   previewPath,
   renderIcon,
@@ -76,15 +58,16 @@ import {
   routerTurnByPath,
   setSessionStorage,
   getLocalStorage,
-  httpErrorHandle,
-  fetchRouteParamsLocation
 } from '@/utils'
 import { icon } from '@/plugins'
 
 const { BrowsersOutlineIcon, SendIcon, CloseIcon } = icon.ionicons5
 const chartEditStore = useChartEditStore()
-
-const previewPathRef = ref(previewPath())
+const url =
+  previewPath().lastIndexOf('?action=') > -1
+    ? previewPath().substring(0, previewPath().lastIndexOf('?action='))
+    : previewPath()
+const previewPathRef = ref(url)
 const { copy, isSupported } = useClipboard({ source: previewPathRef })
 
 const routerParamsInfo = useRoute()
@@ -151,23 +134,23 @@ const copyPreviewPath = (successText?: string, failureText?: string) => {
 
 // 发布
 const sendHandle = async () => {
-  const res = (await updateProjectApi({
-    id: fetchRouteParamsLocation(),
-    // 反过来
-    state: release.value ? -1 : 1
-  })) as unknown as MyResponseType
+  // const res = (await updateProjectApi({
+  //   id: fetchRouteParamsLocation(),
+  //   // 反过来
+  //   state: release.value ? -1 : 1,
+  // })) as unknown as MyResponseType
 
-  if (res.code === ResultEnum.SUCCESS) {
-    modelShowHandle()
-    if (!release.value) {
-      copyPreviewPath('发布成功！已复制地址到剪贴板~', '发布成功！')
-    } else {
-      window['$message'].success(`已取消发布`)
-    }
-    chartEditStore.setProjectInfo(ProjectInfoEnum.RELEASE, !release.value)
-  } else {
-    httpErrorHandle()
-  }
+  // if (res.code === ResultEnum.SUCCESS) {
+  //   modelShowHandle()
+  //   if (!release.value) {
+  //     copyPreviewPath('发布成功！已复制地址到剪贴板~', '发布成功！')
+  //   } else {
+  //     window['$message'].success(`已取消发布`)
+  //   }
+  chartEditStore.setProjectInfo(ProjectInfoEnum.RELEASE, !release.value)
+  // } else {
+  // httpErrorHandle()
+  // }
 }
 
 const btnList = shallowReactive([
@@ -186,15 +169,6 @@ const btnList = shallowReactive([
     event: modelShowHandle
   }
 ])
-
-const largeScreenType = ref('projectLargeScreen')
-const selectSourceHandle = (v: string) => {
-  chartEditStore.setProjectInfo(ProjectInfoEnum.SOURCE, v)
-}
-
-watchEffect(() => {
-  largeScreenType.value = chartEditStore.getProjectInfo.source || 'projectLargeScreen'
-})
 </script>
 
 <style lang="scss" scoped>

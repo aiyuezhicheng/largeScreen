@@ -32,10 +32,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useDesignStore } from '@/store/modules/designStore/designStore'
-import { fetchPathByName, routerTurnByPath, renderLang, getUUID, newGuid ,routerTurnByPathAndParams} from '@/utils'
+import { fetchPathByName, getUUID ,routerTurnByPathAndParams} from '@/utils'
 import { ChartEnum } from '@/enums/pageEnum'
-// import { CreateModal } from './components/CreateModal/index'
-import { createProjectApi, createProjectLargeScreenApi } from '@/api/path'
 
 import { icon } from '@/plugins'
 

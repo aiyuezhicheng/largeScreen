@@ -126,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch, onMounted } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 import { backgroundImageSize } from '@/settings/designSetting'
 import { FileTypeEnum } from '@/enums/fileTypeEnum'
 import { useChartEditStore } from '@/store/modules/chartEditStore/chartEditStore'
@@ -138,7 +138,7 @@ import { fileToUrl, loadAsyncComponent, fetchRouteParamsLocation } from '@/utils
 import { PreviewScaleEnum } from '@/enums/styleEnum'
 import { ResultEnum } from '@/enums/httpEnum'
 import { icon } from '@/plugins'
-import { uploadFile } from '@/api/path'
+import { uploadFile} from '@/api/path'
 
 const { ColorPaletteIcon } = icon.ionicons5
 const { ScaleIcon, FitToScreenIcon, FitToHeightIcon, FitToWidthIcon } = icon.carbon
@@ -205,11 +205,6 @@ const previewTypeList = [
   }
 ]
 
-onMounted(() => {
-  clearImage()
-  clearColor()
-})
-
 watch(
   () => canvasConfig.selectColor,
   newValue => {
@@ -274,28 +269,38 @@ const clearColor = () => {
   switchSelectColorHandle()
 }
 
-// 图片文件转为 base64
-const getPictureBase64 = (file: File) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = error => reject(error)
-  })
-}
-
 // 自定义上传操作
-const customRequest = (options: any) => {
+const customRequest = (options: UploadCustomRequestOptions) => {
   const { file } = options
   nextTick(async () => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file.file)
-    reader.onload = () => {
-      chartEditStore.setEditCanvasConfig(EditCanvasConfigEnum.BACKGROUND_IMAGE, reader.result as string)
-      chartEditStore.setEditCanvasConfig(EditCanvasConfigEnum.SELECT_COLOR, false)
+    if(!systemStore.getFetchInfo.OSSUrl) {
+      window['$message'].error('添加图片失败，请刷新页面重试！')
+      return
     }
-    reader.onerror = error => {
-      console.log(error)
+    if (file.file) {
+      // 修改名称
+      const newNameFile = new File(
+        [file.file],
+        `${fetchRouteParamsLocation()}_index_background.png`,
+        { type: file.file.type }
+      )
+      let uploadParams = new FormData()
+      uploadParams.append('object', newNameFile)
+      const uploadRes = await uploadFile(systemStore.getFetchInfo.OSSUrl ,uploadParams) as unknown as MyResponseType
+
+      if(uploadRes.code === ResultEnum.SUCCESS) {
+        chartEditStore.setEditCanvasConfig(
+          EditCanvasConfigEnum.BACKGROUND_IMAGE,
+          uploadRes.data.objectContent.httpRequest.uri
+        )
+        chartEditStore.setEditCanvasConfig(
+          EditCanvasConfigEnum.SELECT_COLOR,
+          false
+        )
+        return
+      }
+      window['$message'].error('添加图片失败，请稍后重试！')
+    } else {
       window['$message'].error('添加图片失败，请稍后重试！')
     }
   })
@@ -353,8 +358,8 @@ $uploadHeight: 193px;
     padding-right: 2.25em;
   }
   .select-preview-icon {
-    padding-right: 0.68em;
-    padding-left: 0.68em;
+    padding-right: .68em;
+    padding-left: .68em;
   }
   .tabs-box {
     margin-top: 20px;

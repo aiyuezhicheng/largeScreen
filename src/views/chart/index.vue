@@ -1,26 +1,24 @@
 <template>
   <!-- 工作台相关 -->
   <div class="go-chart">
-    <router-view :key="Math.random()">
-      <n-layout>
-        <layout-header-pro>
-          <template #left>
-            <header-left-btn></header-left-btn>
-          </template>
-          <template #center>
-            <header-title></header-title>
-          </template>
-          <template #ri-left>
-            <header-right-btn></header-right-btn>
-          </template>
-        </layout-header-pro>
-        <n-layout-content content-style="overflow:hidden; display: flex">
-          <content-charts></content-charts>
-          <content-layers></content-layers>
-          <content-configurations></content-configurations>
-        </n-layout-content>
-      </n-layout>
-    </router-view>
+    <n-layout>
+      <layout-header-pro>
+        <template #left>
+          <header-left-btn></header-left-btn>
+        </template>
+        <template #center>
+          <header-title></header-title>
+        </template>
+        <template #ri-left>
+          <header-right-btn></header-right-btn>
+        </template>
+      </layout-header-pro>
+      <n-layout-content content-style="overflow:hidden; display: flex">
+        <content-charts></content-charts>
+        <content-layers></content-layers>
+        <content-configurations></content-configurations>
+      </n-layout-content>
+    </n-layout>
   </div>
   <!-- 右键 -->
   <n-dropdown

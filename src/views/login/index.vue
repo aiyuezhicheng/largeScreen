@@ -183,7 +183,6 @@ const handleSubmit = async (e: Event) => {
         const userInfoRes = (await getUserInfoApi()) as unknown as ApiResponseType
         if (userInfoRes) {
           const { IsOk, ErrorMsg, Response } = userInfoRes
-          console.log(userInfoRes)
           if (IsOk) {
             const { UserID, UserName, ProjectID, LoginName } = Response
             // 存储到 pinia

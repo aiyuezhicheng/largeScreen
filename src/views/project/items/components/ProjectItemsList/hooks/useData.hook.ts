@@ -1,7 +1,7 @@
 import { ref, reactive } from 'vue';
 import { goDialog, httpErrorHandle } from '@/utils'
 import { DialogEnum } from '@/enums/pluginEnum'
-import { projectLargeScreenListApi, deleteOneProjectLargeScreenApi, changeProjectReleaseApi } from '@/api/path'
+import { projectLargeScreenListApi, deleteOneProjectLargeScreenApi, changeProjectReleaseApi, saveOneProjectLargeScreenApi } from '@/api/path'
 import { Chartype, ChartList } from '../../..'
 import { ResultEnum } from '@/enums/httpEnum'
 
@@ -25,23 +25,21 @@ export const useDataListInit = () => {
   const fetchList = async () => {
     loading.value = true
     const res = await projectLargeScreenListApi() as any
-    console.log(res);
     if (res) {
       const { IsOk, Response, ErrorMsg } = res
       if (IsOk) {
         paginat.count = Response && Response.length ? Response.length : 0;
         list.value = Response.map((e: any) => {
           var obj = JSON.parse(e);
-          const { id, projectName, state, createTime, indexImage, createUserId, ID, content, source, lastModifyTime } = obj
+          const { id, projectName, state, createTime, indexImage, createUserId, ID, content, lastModifyTime } = obj
           return {
             id: ID || id,
             title: projectName,
             createId: createUserId,
             time: createTime,
             image: indexImage,
-            release: state !== -1,
+            release: state,
             content: content,
-            source: source,
             lastModifyTime: lastModifyTime
           }
         })
@@ -68,7 +66,6 @@ export const useDataListInit = () => {
 
   // 删除处理
   const deleteHandle = (cardData: Chartype) => {
-    console.log(cardData)
     goDialog({
       type: DialogEnum.DELETE,
       promise: true,
@@ -88,25 +85,25 @@ export const useDataListInit = () => {
 
   // 发布处理
   const releaseHandle = async (cardData: Chartype, index: number) => {
-    const { id, release } = cardData
-    const res = await changeProjectReleaseApi({
-      id: id,
-      // [-1未发布, 1发布]
-      state: !release ? 1 : -1
-    }) as unknown as MyResponseType
-    if (res.code === ResultEnum.SUCCESS) {
-      list.value = []
-      fetchList()
-      // 发布 -> 未发布
-      if (release) {
-        window['$message'].success(window['$t']('global.r_unpublish_success'))
-        return
-      }
-      // 未发布 -> 发布
-      window['$message'].success(window['$t']('global.r_publish_success'))
-      return
+    if (!cardData) return
+    const params = {
+      id: cardData.id,
+      ID: cardData.id,
+      projectName: cardData.title,
+      lastModifyTime: new Date().getTime() + '',
+      indexImage: cardData.image,
+      createTime: cardData.createTime,
+      createUserId: cardData.createId,
+      content: cardData.content,
+      state: !cardData.release
     }
-    httpErrorHandle()
+    const res = await saveOneProjectLargeScreenApi(params) as unknown as ApiResponseType
+    if (res && res.IsOk) {
+      window['$message'].success('修改成功!')
+      fetchList()
+    } else {
+      httpErrorHandle(res?.ErrorMsg)
+    }
   }
 
   // 立即请求

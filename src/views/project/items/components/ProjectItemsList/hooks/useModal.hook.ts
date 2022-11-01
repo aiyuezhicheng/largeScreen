@@ -65,9 +65,9 @@ export const useModalDataInit = () => {
     modalData.value = null
   }
 
+  // 重命名
   const renameHandle = async (cardData: Chartype, renameTtile: string) => {
     if (!cardData) return
-    console.log(cardData)
     const params = {
       id: cardData.id,
       ID: cardData.id,
@@ -77,8 +77,7 @@ export const useModalDataInit = () => {
       createTime: cardData.createTime,
       createUserId: cardData.createId,
       content: cardData.content,
-      source: cardData.source,
-      release: cardData.release
+      state: cardData.release
     }
     const res = await saveOneProjectLargeScreenApi(params) as unknown as ApiResponseType
 

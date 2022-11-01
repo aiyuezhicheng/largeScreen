@@ -38,9 +38,8 @@
 import { watch } from 'vue'
 import { icon } from '@/plugins'
 import { PageEnum, ChartEnum } from '@/enums/pageEnum'
-import { ResultEnum } from '@/enums/httpEnum'
 import { fetchPathByName, routerTurnByPath, renderLang, getUUID, newGuid } from '@/utils'
-import { createProjectApi, createProjectLargeScreenApi } from '@/api/path'
+import { createProjectLargeScreenApi } from '@/api/path'
 
 const { FishIcon, CloseIcon } = icon.ionicons5
 const { StoreIcon, ObjectStorageIcon } = icon.carbon

@@ -39,7 +39,6 @@ axiosInstance.interceptors.request.use(
 // 响应拦截器
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
-    console.log(res);
     const { status, data } = res;
     if (status == 200) {
       if(typeof data !="object"){

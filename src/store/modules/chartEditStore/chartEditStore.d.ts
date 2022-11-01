@@ -33,8 +33,6 @@ export enum ProjectInfoEnum {
   THUMBNAIL = 'thumbnail',
   // 是否公开发布
   RELEASE = 'release',
-  // 来源
-  SOURCE = 'source',
   // 创建时间
   CREATETIME = 'createTime',
   // 创建人ID
@@ -48,10 +46,8 @@ export type ProjectInfoType = {
   [ProjectInfoEnum.REMARKS]: string,
   [ProjectInfoEnum.THUMBNAIL]: string,
   [ProjectInfoEnum.RELEASE]: boolean,
-  [ProjectInfoEnum.SOURCE]: string,
   [ProjectInfoEnum.CREATETIME]: string,
   [ProjectInfoEnum.CREATEUSERID]: string,
-
 }
 
 // 编辑画布属性

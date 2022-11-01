@@ -51,7 +51,6 @@ export const useChartEditStore = defineStore({
       remarks: '',
       thumbnail: '',
       release: false,
-      source: 'projectLargeScreen',
       createTime: '',
       createUserId: ''
     },

@@ -186,7 +186,7 @@ export const fetchRouteParams = () => {
     const route = useRoute()
     return route.params
   } catch (error) {
-    window['$message'].warning('查询路由信息失败，请联系管理员！')
+    // window['$message'].warning('查询路由信息失败，请联系管理员！')
   }
 }
 

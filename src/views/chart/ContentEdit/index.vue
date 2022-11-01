@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 import { chartColors } from '@/settings/chartThemes/index'
 import { MenuEnum } from '@/enums/editPageEnum'
 import { CreateComponentType, CreateComponentGroupType } from '@/packages/index.d'
@@ -90,7 +90,7 @@ import { MenuOptionsItemType } from '@/views/chart/hooks/useContextMenu.hook.d'
 import { useChartEditStore } from '@/store/modules/chartEditStore/chartEditStore'
 
 import { useLayout } from './hooks/useLayout.hook'
-import { useAddKeyboard } from '../hooks/useKeyboard.hook'
+import { useAddKeyboard, useRemoveKeyboard } from '../hooks/useKeyboard.hook'
 import { useSync } from '../hooks/useSync.hook'
 import { dragHandle, dragoverHandle, mousedownHandleUnStop, useMouseHandle } from './hooks/useDrag.hook'
 import { useComponentStyle, useSizeStyle } from './hooks/useStyle.hook'
@@ -181,6 +181,11 @@ onMounted(() => {
   dataSyncFetch()
   // 定时更新数据
   // intervalDataSyncUpdate()
+})
+
+onUnmounted(() => {
+  // 键盘事件
+  useRemoveKeyboard()
 })
 </script>
 

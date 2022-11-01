@@ -1,5 +1,7 @@
 import { onUnmounted } from 'vue';
 import html2canvas from 'html2canvas'
+import { defaultTheme, globalThemeJson } from '@/settings/chartThemes/index'
+import { requestInterval, previewScaleType, requestIntervalUnit } from '@/settings/designSetting'
 import { getUUID, httpErrorHandle, fetchRouteParamsLocation, base64toFile, fetchRouteParams, isNotEmptyGuid, fetchPathByName, routerTurnByPathAndParams } from '@/utils'
 import { useChartEditStore } from '@/store/modules/chartEditStore/chartEditStore'
 import { EditCanvasTypeEnum, ChartEditStoreEnum, ProjectInfoEnum, ChartEditStorage } from '@/store/modules/chartEditStore/chartEditStore.d'
@@ -44,7 +46,6 @@ const componentMerge = (object: any, sources: any, notComponent = false) => {
 
 // 请求处理
 export const useSync = () => {
-  console.log('保存')
   const chartEditStore = useChartEditStore()
   const chartHistoryStore = useChartHistoryStore()
   const systemStore = useSystemStore()
@@ -155,11 +156,10 @@ export const useSync = () => {
     indexImage: string,
     remarks: string,
     state: number,
-    source: string,
     createTime: string
     createUserId: string
   }) => {
-    const { id, projectName, remarks, indexImage, state, source, createTime, createUserId } = projectData
+    const { id, projectName, remarks, indexImage, state, createTime, createUserId } = projectData
     // ID
     chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, id)
     // 名称
@@ -170,13 +170,12 @@ export const useSync = () => {
     chartEditStore.setProjectInfo(ProjectInfoEnum.THUMBNAIL, indexImage)
     // 发布
     chartEditStore.setProjectInfo(ProjectInfoEnum.RELEASE, state === 1)
-    // 来源
-    chartEditStore.setProjectInfo(ProjectInfoEnum.SOURCE, source)
     // 创建时间
     chartEditStore.setProjectInfo(ProjectInfoEnum.CREATETIME, createTime)
     // 创建人ID
     chartEditStore.setProjectInfo(ProjectInfoEnum.CREATEUSERID, createUserId)
   }
+
 
   // * 数据获取
   const dataSyncFetch = async () => {
@@ -214,9 +213,66 @@ export const useSync = () => {
         }
         chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
       } else {
+        const emptyConfig: ChartEditStorage = {
+          // 默认新建配置
+          editCanvasConfig: {
+            // 默认宽度
+            width: 1920,
+            // 默认高度
+            height: 1080,
+            // 启用滤镜
+            filterShow: false,
+            // 色相
+            hueRotate: 0,
+            // 饱和度
+            saturate: 1,
+            // 对比度
+            contrast: 1,
+            // 亮度
+            brightness: 1,
+            // 透明度
+            opacity: 1,
+            // 变换（暂不更改）
+            rotateZ: 0,
+            rotateX: 0,
+            rotateY: 0,
+            skewX: 0,
+            skewY: 0,
+            // 混合模式
+            blendMode: 'normal',
+            // 默认背景色
+            background: undefined,
+            backgroundImage: undefined,
+            // 是否使用纯颜色
+            selectColor: true,
+            // chart 主题色
+            chartThemeColor: defaultTheme || 'dark',
+            // 全局配置
+            chartThemeSetting: globalThemeJson,
+            // 预览方式
+            previewScaleType: previewScaleType
+          },
+          requestGlobalConfig: {
+            requestOriginUrl: '',
+            requestInterval: requestInterval,
+            requestIntervalUnit: requestIntervalUnit,
+            requestParams: {
+              Body: {
+                'form-data': {},
+                'x-www-form-urlencoded': {},
+                json: '',
+                xml: ''
+              },
+              Header: {},
+              Params: {}
+            }
+          },
+          //列表
+          componentList: []
+        }
+        await updateComponent(emptyConfig, true);
         chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_ID, projectid as string)
         chartEditStore.setProjectInfo(ProjectInfoEnum.PROJECT_NAME, projectid as string)
-        chartEditStore.setProjectInfo(ProjectInfoEnum.SOURCE, 'projectLargeScreen')
       }
     } catch (error) {
       chartEditStore.setEditCanvas(EditCanvasTypeEnum.SAVE_STATUS, SyncEnum.FAILURE)
@@ -274,11 +330,10 @@ export const useSync = () => {
 
     let params = {
       content: JSON.stringify(chartEditStore.getStorageInfo || {}),
-      // ID: projectId,
       projectName: chartEditStore.getProjectInfo[ProjectInfoEnum.PROJECT_NAME],
       lastModifyTime: new Date().getTime(),
       indexImage: canvasImage.toDataURL(),
-      source: chartEditStore.getProjectInfo[ProjectInfoEnum.SOURCE]
+      state: chartEditStore.getProjectInfo[ProjectInfoEnum.RELEASE],
     }
     if (id && isNotEmptyGuid(id) && action == 'edit') {
       const createTime = chartEditStore.getProjectInfo[ProjectInfoEnum.CREATETIME]
