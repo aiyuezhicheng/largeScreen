@@ -4,7 +4,7 @@ import { ContentTypeEnum, RequestHttpEnum, ModuleTypeEnum } from '@/enums/httpEn
 
 // * 项目列表
 export const projectListApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.GET)(`${ModuleTypeEnum.PROJECT}/list`, data);
     return res;
   } catch {
@@ -15,7 +15,7 @@ export const projectListApi = async (data: object) => {
 
 // * 新增项目
 export const createProjectApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.POST)(`${ModuleTypeEnum.PROJECT}/create`, data);
     return res;
   } catch {
@@ -25,7 +25,7 @@ export const createProjectApi = async (data: object) => {
 
 // * 获取项目
 export const fetchProjectApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.GET)(`${ModuleTypeEnum.PROJECT}/getData`, data);
     return res;
   } catch {
@@ -35,7 +35,7 @@ export const fetchProjectApi = async (data: object) => {
 
 // * 保存项目
 export const saveProjectApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.POST)(`${ModuleTypeEnum.PROJECT}/save/data`, data, ContentTypeEnum.FORM_URLENCODED);
     return res;
   } catch {
@@ -56,7 +56,7 @@ export const updateProjectApi = async (data: object) => {
 
 // * 删除项目
 export const deleteProjectApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.DELETE)(`${ModuleTypeEnum.PROJECT}/delete`, data);
     return res;
   } catch {
@@ -66,7 +66,7 @@ export const deleteProjectApi = async (data: object) => {
 
 // * 修改发布状态 [-1未发布,1发布]
 export const changeProjectReleaseApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.PUT)(`${ModuleTypeEnum.PROJECT}/publish`, data);
     return res;
   } catch {
@@ -75,8 +75,8 @@ export const changeProjectReleaseApi = async (data: object) => {
 }
 
 // * 上传文件
-export const uploadFile = async (url:string, data: object) => {
-  try { 
+export const uploadFile = async (url: string, data: object) => {
+  try {
     const res = await http(RequestHttpEnum.POST)(url, data, ContentTypeEnum.FORM_DATA);
     return res;
   } catch {
@@ -86,7 +86,7 @@ export const uploadFile = async (url:string, data: object) => {
 
 // * 项目大屏列表
 export const projectLargeScreenListApi = async () => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.GET)(`CustomData/GetAll?docName=ProjectLargeScreen`);
     return res;
   } catch {
@@ -96,7 +96,7 @@ export const projectLargeScreenListApi = async () => {
 
 // * 新增项目
 export const createProjectLargeScreenApi = async (data: object) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.POST)(`CustomData/Create?docName=ProjectLargeScreen`, { Data: JSON.stringify(data) });
     return res;
   } catch {
@@ -106,7 +106,7 @@ export const createProjectLargeScreenApi = async (data: object) => {
 
 // * 删除项目
 export const deleteOneProjectLargeScreenApi = async (id: string) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.DELETE)(`CustomData/Delete?docName=ProjectLargeScreen&id=${id}`);
     return res;
   } catch {
@@ -116,7 +116,7 @@ export const deleteOneProjectLargeScreenApi = async (id: string) => {
 
 // * 获取项目
 export const fetchOneProjectLargeScreenApi = async (id: string) => {
-  try { 
+  try {
     const res = await http(RequestHttpEnum.GET)(`CustomData/GetByID?docName=ProjectLargeScreen&id=${id}`);
     return res;
   } catch {
@@ -126,8 +126,58 @@ export const fetchOneProjectLargeScreenApi = async (id: string) => {
 
 // * 保存项目
 export const saveOneProjectLargeScreenApi = async (data: object) => {
-  try { 
-    const res = await http(RequestHttpEnum.PUT)(`CustomData/Modify?docName=ProjectLargeScreen`,  { Data: JSON.stringify(data) });
+  try {
+    const res = await http(RequestHttpEnum.PUT)(`CustomData/Modify?docName=ProjectLargeScreen`, { Data: JSON.stringify(data) });
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 获取一个大屏盒子
+export const fetchOneLargeScreenBoxApi = async (id: string) => {
+  try {
+    const res = await http(RequestHttpEnum.GET)(`imFigure/GetByID?id=${id}`);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 获取所有大屏盒子
+export const fetchLargeScreenBoxListApi = async () => {
+  try {
+    const res = await http(RequestHttpEnum.GET)(`imFigure/GetAll`);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 新增大屏盒子
+export const createOneLargeScreenBoxApi = async (data: object) => {
+  try {
+    const res = await http(RequestHttpEnum.POST)(`imFigure/Create`, data);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 保存大屏盒子
+export const saveOneLargeScreenBoxApi = async (data: object) => {
+  try {
+    const res = await http(RequestHttpEnum.PUT)(`imFigure/Modify`, data);
+    return res;
+  } catch {
+    httpErrorHandle();
+  }
+}
+
+// * 删除项目
+export const deleteOneLargeScreenBoxApi = async (id: string) => {
+  try {
+    const res = await http(RequestHttpEnum.DELETE)(`imFigure/Delete?id=${id}`);
     return res;
   } catch {
     httpErrorHandle();
